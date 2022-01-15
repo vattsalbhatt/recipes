@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script
+      src="https://kit.fontawesome.com/db1cefd446.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="./styles/latest.css" />
+  </head>
+  <body>
+    <div class="main">
+      <div id="container"></div>
+      <div id="content">
+        <div id="title"></div>
+        <div id="image"></div>
+        <div id="desc">
+          <h3>Instructions</h3>
+        </div>
+        <div id="ing">
+          <h3>Ingredients</h3>
+        </div>
+        <h3>Watch Video</h3>
+        <div id="youtube"></div>
+      </div>
+    </div>
+  </body>
+</html>
+<script type="module">
+  import navbar from "./components/navbar.js";
+  let nav = document.querySelector("#container");
+  
+  nav.innerHTML = navbar();
+  let arr = JSON.parse(localStorage.getItem("dish")) || [];
+  console.log("arr:", arr);
+  let lastQuery = arr.length - 1;
+
+  console.log("lastQuery:", lastQuery, arr[0]);
+
+  //Username show
+  let recipeUser = JSON.parse(localStorage.getItem("recipeUser")) || [];
+  let lastRecipeUser = recipeUser[recipeUser.length - 1];
+  // alert(`Welcome ${lastRecipeUser.username}`);
+  if (lastRecipeUser == undefined) {
+    document.querySelector("#p4").textContent = "login";
+  } else {
+    document.querySelector("#p4").textContent = lastRecipeUser.username;
+  }
+
+  let showData = (x) => {
+    console.log(x);
+    let title = document.createElement("h2");
+    title.textContent = x.strMeal;
+    let country = document.createElement("p");
+    country.textContent = `(${x.strArea})`;
+    let img = document.createElement("img");
+    img.src = x.strMealThumb;
+    console.log("img:", x.strMealThumb);
+    let desc = document.createElement("p");
+    desc.textContent = x.strInstructions;
+    let ing = document.createElement("p");
+    ing.textContent = `${x.strIngredient1} (${x.strMeasure1}), ${x.strIngredient2} (${x.strMeasure2}), ${x.strIngredient3} (${x.strMeasure3}), ${x.strIngredient4} (${x.strMeasure4}), ${x.strIngredient5} (${x.strMeasure5}), ${x.strIngredient6} (${x.strMeasure6}), ${x.strIngredient7} (${x.strMeasure7}), ${x.strIngredient8} (${x.strMeasure8}), ${x.strIngredient9} (${x.strMeasure9}), ${x.strIngredient10} (${x.strMeasure10}),`;
+    let ytLink = x.strYoutube;
+    let [link, id] = ytLink.split("=");
+    // console.log(id);
+    console.log("ytLink:");
+
+    document.querySelector(
+      "#youtube"
+    ).innerHTML = `<iframe width="560" height="315" src="https://www.youtube.com/embed/${id}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+
+    document.querySelector("#title").append(title, country);
+    document.querySelector("#image").append(img);
+    document.querySelector("#desc").append(desc);
+    document.querySelector("#ing").append(ing);
+  };
+  showData(arr[lastQuery]);
+  document.querySelector("#p1").addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
+  document.querySelector("#p2").addEventListener("click", () => {
+    window.location.href = "trending.html";
+  });
+  document.querySelector("#p3").addEventListener("click", () => {
+    window.location.href = "random.html";
+  });
+</script>

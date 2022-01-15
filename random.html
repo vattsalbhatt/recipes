@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://kit.fontawesome.com/db1cefd446.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="./styles/random.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="main">
+      <div id="container"></div>
+      <div id="recipes"></div>
+    </div>
+  </body>
+</html>
+<script type="module">
+  import navbar from "./components/navbar.js";
+  console.log(navbar);
+  let arr = JSON.parse(localStorage.getItem("dish")) || [];
+
+  let container = document.querySelector("#container");
+  container.innerHTML = navbar();
+
+  //Username show
+  let recipeUser = JSON.parse(localStorage.getItem("recipeUser")) || [];
+  let lastRecipeUser = recipeUser[recipeUser.length - 1];
+  // alert(`Welcome ${lastRecipeUser.username}`);
+  if (lastRecipeUser == undefined) {
+    document.querySelector("#p4").textContent = "login";
+  } else {
+    document.querySelector("#p4").textContent = lastRecipeUser.username;
+  }
+
+  async function getData() {
+    try {
+      let response = await fetch(
+        `https://www.themealdb.com/api/json/v1/1/search.php?s=`
+      );
+      let obj = await response.json();
+      let items = obj.meals;
+      console.log("items:", items);
+      appendData(items);
+      // console.log("obj:", obj);
+    } catch (err) {
+      console.log("err:", err);
+    }
+  }
+
+  getData();
+  let appendData = (data) => {
+    data.forEach((elem) => {
+      let mainDiv = document.createElement("div");
+      let smallDiv = document.createElement("div");
+      let name = document.createElement("h4");
+      name.innerText = `${elem.strMeal}`;
+      let click = document.createElement("p");
+      click.innerText = `Read more..`;
+      let img = document.createElement("img");
+      img.src = elem.strMealThumb;
+      smallDiv.append(img);
+      mainDiv.append(smallDiv, name, click);
+      name.addEventListener("click", function () {
+        showData(elem);
+      });
+      mainDiv.addEventListener("click", () => {
+        showData(elem);
+      });
+      document.querySelector("#recipes").append(mainDiv);
+    });
+  };
+
+  let showData = (elem) => {
+    arr.push(elem);
+    localStorage.setItem("dish", JSON.stringify(arr));
+    window.location.href = "latest.html";
+    console.log(arr);
+  };
+
+  document.querySelector("#p1").addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
+  document.querySelector("#p2").addEventListener("click", () => {
+    window.location.href = "trending.html";
+  });
+  document.querySelector("#p3").addEventListener("click", () => {
+    window.location.href = "random.html";
+  });
+</script>

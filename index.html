@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://kit.fontawesome.com/db1cefd446.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="./styles/index.css" />
+    <title>Document</title>
+    <style></style>
+  </head>
+  <body>
+    <div id="main">
+      <div id="container"></div>
+      <div id="searchBar">
+        <div id="logoDiv">
+          <img
+            src="./images/nobgLogo-removebg-preview.png"
+            alt="logo-transparent"
+          />
+        </div>
+        <div id="searchBox">
+          <input type="text" id="find" placeholder="find any recipe here!" />
+          <button id="btn">Search</button>
+          <div id="results"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script type="module">
+  let arr = JSON.parse(localStorage.getItem("dish")) || [];
+
+  //  Import
+  import navbar from "./components/navbar.js";
+
+  // Navbar Starts
+  let container = document.querySelector("#container");
+  container.innerHTML = navbar();
+  // Navbar Ends
+
+  //Username show
+  let recipeUser = JSON.parse(localStorage.getItem("recipeUser")) || [];
+  let lastRecipeUser = recipeUser[recipeUser.length - 1];
+  // alert(`Welcome ${lastRecipeUser.username}`);
+  if (lastRecipeUser == undefined) {
+    document.querySelector("#p4").textContent = "login";
+  } else {
+    document.querySelector("#p4").textContent = lastRecipeUser.username;
+  }
+  document.querySelector("#p4").addEventListener("click", function () {
+    window.location.href = "login.html";
+  });
+  //Debouncing
+  let waiting;
+  let location = document.querySelector("#results");
+  document.querySelector("#find").addEventListener("input", () => {
+    debouncing(getData, 1000);
+  });
+  async function getData() {
+    try {
+      let value = document.querySelector("#find").value;
+      if (value.length < 2) {
+        return false;
+      }
+      let response = await fetch(
+        `https://www.themealdb.com/api/json/v1/1/search.php?s=${value}`
+      );
+      let obj = await response.json();
+      let items = obj.meals;
+      // console.log("items:", items);
+      appendData(items);
+      // console.log("obj:", obj);
+    } catch (err) {
+      console.log("err:", err);
+    }
+  }
+
+  let appendData = (data) => {
+    location.innerHTML = null;
+    if (data === undefined) {
+      return false;
+    }
+    data.forEach((elem) => {
+      let mainDiv = document.createElement("div");
+      let smallDiv = document.createElement("div");
+      let name = document.createElement("p");
+      name.innerText = `${elem.strArea} ${elem.strMeal}`;
+      let img = document.createElement("img");
+      img.src = elem.strMealThumb;
+      smallDiv.append(img);
+      mainDiv.append(smallDiv, name);
+      name.addEventListener("click", function () {
+        showData(elem);
+      });
+      location.style.display = "block";
+      location.append(mainDiv);
+    });
+  };
+
+  let showData = (elem) => {
+    arr.push(elem);
+    localStorage.setItem("dish", JSON.stringify(arr));
+    window.location.href = "latest.html";
+    console.log(arr);
+  };
+
+  document.querySelector("#p1").addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
+  document.querySelector("#p2").addEventListener("click", () => {
+    window.location.href = "trending.html";
+  });
+  document.querySelector("#p3").addEventListener("click", () => {
+    window.location.href = "random.html";
+  });
+
+  let debouncing = (fn, delay) => {
+    if (waiting) {
+      clearTimeout(waiting);
+    } else {
+      fn();
+    }
+
+    waiting = setTimeout(function () {
+      fn();
+    }, delay);
+  };
+</script>
